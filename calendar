@@ -160,7 +160,7 @@ $Profiles->{'DE'} = # Deutschland (+Fronleichnam fuer Hessen)
 # Main routine {{{1
 if ($#ARGV == 0
 	&& defined $ARGV[0]
-	&& $ARGV[0] =~ /(\d{4})/
+	&& $ARGV[0] =~ /^(\d{4})$/
 	&& int($1) >= (localtime)[5] + 1900) {
 	DoMain $ARGV[0];
 }

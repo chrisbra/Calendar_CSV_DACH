@@ -77,12 +77,12 @@ sub DoMain #{{{1
 			# Weekday name
 			printf $fh "%s;", Day_of_Week_to_Text($dow);
 			# Day typ
-			if ($cal->is_full($year, $month, $day))
+			if ($dow > 5){
+				print $fh "X;";
+			}
+			elsif ($cal->is_full($year, $month, $day))
 			{
 				print $fh "F;";
-			}
-			elsif ($dow > 5){
-				print $fh "X;";
 			}
 			else {
 				print $fh "W;";

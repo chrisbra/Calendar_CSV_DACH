@@ -132,10 +132,16 @@ sub usage #{{{1
 	print <<EOF;
 $name
 Usage: $name <year>
-$name generates calendars in csv format for each of the countries Germany (Hessen), Austria and Switzerland and stores each of them in a file called src_man_Kalendar<country>.dat in the current directory.
+
+$name generates calendars in csv format for each of the countries Germany
+(Hessen), Austria and Switzerland and stores each of them in a file called
+src_man_Kalendar<country>.dat in the current directory.
 
 Option:
 -h --help				This screen
+<year>                  Create a csv list up to and including this year,
+						therefore <year> needs to be greater or equal to
+						the current year.
 EOF
 	exit(0);
 }
@@ -152,11 +158,14 @@ $Profiles->{'DE'} = # Deutschland (+Fronleichnam fuer Hessen)
 };
 
 # Main routine {{{1
-if ($#ARGV < 0 || (defined($ARGV[0]) && $ARGV[0] !~ /\d{4}/)){
-	usage;
+if ($#ARGV == 0
+	&& defined $ARGV[0]
+	&& $ARGV[0] =~ /(\d{4})/
+	&& int($1) >= (localtime)[5] + 1900) {
+	DoMain $ARGV[0];
 }
 else {
-	DoMain $ARGV[0];
+	usage;
 }
 
 

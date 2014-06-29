@@ -32,6 +32,7 @@ sub Wrkd_Nbr_Yr #{{{1
 sub DoMain #{{{1
 {
 	my $year_end = shift;
+	my $year     = shift;
 	my @calendar   = ("DE", "AT", "CH-DE");
 	Language(Decode_Language("Deutsch")); # deutsche Ausgabe
 
@@ -42,7 +43,6 @@ sub DoMain #{{{1
 			die "Can't open file $filename for writing: $!\n";
 		my $month = 1;
 		my $day   = 1;
-		my $year  = (localtime)[5] + 1900;
 		my $days  = Date_to_Days($year, $month, $day);
 		my $cal   = Date::Calendar->new($Profiles->{$_},1);
 		my %count = (
@@ -138,10 +138,11 @@ $name generates calendars in csv format for each of the countries Germany
 src_man_Kalendar<country>.dat in the current directory.
 
 Option:
--h --help				This screen
+-h --help		This screen
 <year>                  Create a csv list up to and including this year,
-						therefore <year> needs to be greater or equal to
-						the current year.
+			therefore <year> needs to be greater or equal to
+			the current year.
+-s year                 Start date of calendar
 EOF
 	exit(0);
 }
@@ -160,6 +161,7 @@ $Profiles->{'DE'} = # Deutschland (+Fronleichnam fuer Hessen)
 # Main routine {{{1
 if ($#ARGV == 0
 	&& defined $ARGV[0]
+	&& $ARGV[0] =~ /-s (\d{4})/
 	&& $ARGV[0] =~ /^(\d{4})$/
 	&& int($1) >= (localtime)[5] + 1900) {
 	DoMain $ARGV[0];

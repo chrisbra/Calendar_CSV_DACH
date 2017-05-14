@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-
 # use packages {{{1
 use warnings;
 use strict;
@@ -15,7 +14,6 @@ sub Wrkd_Nbr_Mth #{{{1
 	return $cal->delta_workdays($year, $month, 1,
 		$year, $month, $days, 1, 1);
 }
-
 sub Wrkd_Nbr_Qtr #{{{1
 {
 	(my $year, my $qrt, my $cal) = @_;
@@ -31,12 +29,17 @@ sub Wrkd_Nbr_Yr #{{{1
 }
 sub DoMain #{{{1
 {
-	my $year_end = shift;
-	my $year     = shift;
-	my @calendar   = ("DE", "AT", "CH-DE");
+	my $year_end_arg = shift;
+	my $year_arg     = shift;
+	my @calendar     = ("DE", "AT", "CH-DE");
+    my $year;
+    my $year_end;
 	Language(Decode_Language("Deutsch")); # deutsche Ausgabe
 
 	foreach (@calendar){
+        $year_end = $year_end_arg;
+        $year  = $year_arg;
+        printf "Startyear: %d Endyear: %d", $year, $year_end;
 		print "Generating kalendar for: ".  $_;
 		my $filename = "src_man_Kalender_" . $_ . ".dat";
 		open(my $fh, '>', $filename) or
@@ -55,7 +58,26 @@ sub DoMain #{{{1
 		my %Wrkd_Yr;
 		my $text;
 		# generate Header
-		print $fh "TM_ID;DT;YR;QTR;MTH_NM;WK;WKD_NM;DY_TYP;Tertiaer;WRKD_NBR_MTH;TOT_WRKD_NBR_MTH;WRKD_NBR_QTR;TOT_WRKD_NBR_QTR;WRKD_NBR_YR;TOT_WRKD_NBR_YR;MTH_NM_SHRT;ISO_YR;ISO_WK\n";
+        # TM_ID: Time ID
+        # DT: Datum
+        # YR: Year
+        # QTR: Quartal
+        # MTH_NM: Month Name
+        # WK: Week
+        # WKD_NM: Weekday Name
+        # DY_TYP: Day Type F: Feiertag, W: Weekday, X: Weekend
+        # Tertitaer:  (not used currently)
+        # WRKD_NBR_MTH: Working Day Month (aktueller Working Day for current month)
+        # TOT_WRKD_NBR_MTH: Anzahl Working Days Month
+        # WRKD_NBR_QTR Working Day Quartal (aktueller Working Day for current quartal)
+        # TOT_WRKD_NBR_QTR Anzahl Working Days Quartal
+        # WRKD_NBR_YR Working Day Year (aktueller Working Day for current year)
+        # TOT_WRKD_NBR_YR Anzahl Working Days Year
+        # MTH_NM_SHRT: Monatsname kurz
+        # ISO_YR: Iso Year
+        # ISO_WK: Iso Week
+        #print $fh "TM_ID;DT;YR;QTR;MTH_NM;WK;WKD_NM;DY_TYP;Tertiaer;WRKD_NBR_MTH;TOT_WRKD_NBR_MTH;WRKD_NBR_QTR;TOT_WRKD_NBR_QTR;WRKD_NBR_YR;TOT_WRKD_NBR_YR;MTH_NM_SHRT;ISO_YR;ISO_WK\n";
+		print $fh "TM_ID;DT;YR;QTR;MTH_NM;WK;WKD_NM;DY_TYP;WRKD_NBR_MTH;TOT_WRKD_NBR_MTH;WRKD_NBR_QTR;TOT_WRKD_NBR_QTR;WRKD_NBR_YR;TOT_WRKD_NBR_YR;MTH_NM_SHRT;ISO_YR;ISO_WK\n";
 
 		do {
 			my $dow   = Day_of_Week($year, $month, $day);
@@ -77,11 +99,9 @@ sub DoMain #{{{1
 			# Qtr
 			printf $fh "%i;", $qrt;
 			# Month name
-#			$text = Month_to_Text($month);
 			printf $fh "%s;", ($text = Month_to_Text($month)) =~ s/\xe4/ae/ru;
 			# Week
 			printf $fh "%d;", $week;
-#			printf $fh "%d;", int(($day + Day_of_Week($year, $month, 1) - 2) / 7) + 1;
 			# Weekday name
 			printf $fh "%s;", Day_of_Week_to_Text($dow);
 			# Day typ
@@ -99,7 +119,7 @@ sub DoMain #{{{1
 				$count{"year"}++;
 			}
 			# Tertiär (nicht benutzt)
-			print $fh ";";
+            # print $fh ";";
 			# WRKD_NBR_MTH
 			printf $fh "%d;", $count{"month"};
 			# TOT_WRKD_NBR_MTH
@@ -133,7 +153,6 @@ sub DoMain #{{{1
 		print "\t\tDone\n";
 	}
 }
-
 sub usage #{{{1
 {
 	chomp(my $name=`basename $0`);
@@ -154,7 +173,6 @@ Option:
 EOF
 	exit(0);
 }
-
 # Configuration #{{{1
 # Definierter Kalender für Deutschland
 # fügt Fronleichnam als ges. Feiertag hinzu, behandle Heiligabend
@@ -165,24 +183,19 @@ $Profiles->{'DE'} = # Deutschland (+Fronleichnam fuer Hessen)
     "Heiligabend"               => "24.12.",
     "Sylvester"                 => "31.12."
 };
-
 # Main routine {{{1
 if (defined $ARGV[0]
 	&& $ARGV[0] =~ /^(\d{4})$/) {
-#	&& int($1) >= (localtime)[5] + 1900) {
 	my $year = 2000;
 
 	if (defined $ARGV[1] && defined $ARGV[2]
 	    && $ARGV[2] =~ /(\d{4})/){
 	    $year = $1;
 	}
-	
 	DoMain ($ARGV[0], $year);
 }
 else {
 	usage;
 }
-
-
 # Modeline {{{1
 # vim: set fdm=marker fdl=0 ft=perl:

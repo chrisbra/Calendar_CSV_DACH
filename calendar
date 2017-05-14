@@ -29,17 +29,14 @@ sub Wrkd_Nbr_Yr #{{{1
 }
 sub DoMain #{{{1
 {
-	my $year_end_arg = shift;
-	my $year_arg     = shift;
 	my @calendar     = ("DE", "AT", "CH-DE");
     my $year;
     my $year_end;
 	Language(Decode_Language("Deutsch")); # deutsche Ausgabe
 
 	foreach (@calendar){
-        $year_end = $year_end_arg;
-        $year  = $year_arg;
-        printf "Startyear: %d Endyear: %d", $year, $year_end;
+        $year_end = $_[0];
+        $year  = $_[1];
 		print "Generating kalendar for: ".  $_;
 		my $filename = "src_man_Kalender_" . $_ . ".dat";
 		open(my $fh, '>', $filename) or
